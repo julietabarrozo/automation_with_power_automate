@@ -19,9 +19,11 @@ The flow evaluates the arrival timestamp and day of the week in real time to pre
 [📩 Trigger: Shared Mailbox Email]
        │
        ▼
+       
 [🌐 Timezone Conversion] ─────► Convert UTC to EST (Eastern Standard Time)
        │
        ▼
+       
 [❓ Business Hours Check] ────► Is it Mon-Fri AND between 8:00 AM - 5:00 PM?
        │
        ├──────► [YES] ──► 🔔 [Immediate Action]
