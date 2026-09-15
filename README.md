@@ -1,9 +1,9 @@
-# ⚙️ Automated Email Notifications
+# ⚙️ Automated Email Notifications (EST Timezone)
 
 ## 📌 Project Overview
 An automated workflow developed in **Power Automate** to monitor a shared mailbox and trigger real-time notifications via **Microsoft Teams**.
 
-The flow evaluates the arrival timestamp and day of the week in real time to prevent sending alerts during weekends or after hours, dynamically rescheduling the notification for the next business day at the start of the shift.
+The flow evaluates the arrival timestamp and day of the week in real time using the **Eastern Standard Time (EST)** zone. This prevents sending alerts during weekends or after hours, dynamically rescheduling the notification for the next business day at the start of the shift.
 
 ---
 
@@ -15,17 +15,13 @@ The flow evaluates the arrival timestamp and day of the week in real time to pre
 
 ---
 
-## 📐 Workflow Architecture
-```mermaid
-graph TD
-    A[📩 Trigger: Shared Mailbox Email] --> B[🌐 Convert Timestamp to EST]
-    B --> C{❓ Is it business hours?<br/>Mon-Fri, 8:00 AM - 5:00 PM EST}
-    
-    C -- YES --> D[🔔 Teams Bot: Immediate Notification]
-    
-    C -- NO --> E[🧮 Logic Expression: Evaluate day & calculate delay]
-    E --> F[⏳ Delay Until: Wait until 08:00 AM next business day]
-    F --> G[🔔 Teams Bot: Scheduled Notification]
+## 📐 Workflow Logic
+1. **📩 Trigger:** A new email arrives in the shared mailbox.
+2. **🌐 Timezone Conversion:** The arrival timestamp is instantly converted to **EST**.
+3. **❓ Condition Evaluation:** The system checks if the current time is within business hours (**Mon-Fri, 8:00 AM - 5:00 PM EST**).
+   - **🟢 If YES:** The **Microsoft Teams Bot** sends an immediate notification.
+   - **🔴 If NO:** A logical expression calculates the exact time gap until the next business day at **8:00 AM EST**, holds the execution using a **Delay Until** action, and then sends the notification.
+
 
     style A fill:#0078D4,color:#fff
     style C fill:#f3f2f1,stroke:#333
