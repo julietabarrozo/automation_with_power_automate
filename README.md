@@ -16,11 +16,19 @@ The flow evaluates the arrival timestamp and day of the week in real time to pre
 ---
 
 ## 📐 Workflow Architecture
+[📩 Trigger: Shared Mailbox Email]
+       │
+       ▼
+[🌐 Timezone Conversion] ─────► Convert UTC to EST (Eastern Standard Time)
+       │
+       ▼
+[❓ Business Hours Check] ────► Is it Mon-Fri AND between 8:00 AM - 5:00 PM?
+       │
+       ├──────► [YES] ──► 🔔 [Immediate Action]
+       │                  Send instant Teams notification to assigned analyst
+       │
+       └──────► [NO]  ──► 🧮 [Delayed Action]
+                          1. Calculate days to add (handles weekend logic)
+                          2. Pause execution until 08:00 AM next business day
+                          3. 🔔 Send scheduled Teams notification
 
-```mermaid
-graph TD;
-    A[📩 New Email in Shared Mailbox] --> B{Is it a business day & working hours?<br/>Mon-Fri, 8:00 AM - 5:00 PM EST};
-    B -- Yes (True) --> C[🔔 Immediate Teams Notification];
-    B -- No (False) --> D[🧮 Calculate Days to Add];
-    D --> E[⏳ Delay Until: Wait until 08:00 AM next business day];
-    E --> F[🔔 Scheduled Teams Notification];
