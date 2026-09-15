@@ -21,11 +21,3 @@ The flow evaluates the arrival timestamp and day of the week in real time using 
 3. **❓ Condition Evaluation:** The system checks if the current time is within business hours (**Mon-Fri, 8:00 AM - 5:00 PM EST**).
    - **🟢 If YES:** The **Microsoft Teams Bot** sends an immediate notification.
    - **🔴 If NO:** A logical expression calculates the exact time gap until the next business day at **8:00 AM EST**, holds the execution using a **Delay Until** action, and then sends the notification.
-
-
-    style A fill:#0078D4,color:#fff
-    style C fill:#f3f2f1,stroke:#333
-    style D fill:#107C41,color:#fff
-    style G fill:#107C41,color:#fff
-
-
