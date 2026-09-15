@@ -29,7 +29,9 @@
           "inputs": {
             "parameters": {
               "mailboxAddress": "shared_mailbox@company.com",
-              "from": "sender@company.com"
+              "from": ["sender@company.com",
+                anothersender@company.com
+              ]
             },
             "host": {
               "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365",
