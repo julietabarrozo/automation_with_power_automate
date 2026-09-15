@@ -16,21 +16,20 @@ The flow evaluates the arrival timestamp and day of the week in real time to pre
 ---
 
 ## 📐 Workflow Architecture
-[📩 Trigger: Shared Mailbox Email]
-       │
-       ▼
-       
-[🌐 Timezone Conversion] ─────► Convert UTC to EST (Eastern Standard Time)
-       │
-       ▼
-       
-[❓ Business Hours Check] ────► Is it Mon-Fri AND between 8:00 AM - 5:00 PM?
-       │
-       ├──────► [YES] ──► 🔔 [Immediate Action]
-       │                  Send instant Teams notification to assigned analyst
-       │
-       └──────► [NO]  ──► 🧮 [Delayed Action]
-                          1. Calculate days to add (handles weekend logic)
-                          2. Pause execution until 08:00 AM next business day
-                          3. 🔔 Send scheduled Teams notification
+```mermaid
+graph TD
+    A[📩 Trigger: Shared Mailbox Email] --> B[🌐 Convert Timestamp to EST]
+    B --> C{❓ Is it business hours?<br/>Mon-Fri, 8:00 AM - 5:00 PM EST}
+    
+    C -- YES --> D[🔔 Teams Bot: Immediate Notification]
+    
+    C -- NO --> E[🧮 Logic Expression: Evaluate day & calculate delay]
+    E --> F[⏳ Delay Until: Wait until 08:00 AM next business day]
+    F --> G[🔔 Teams Bot: Scheduled Notification]
+
+    style A fill:#0078D4,color:#fff
+    style C fill:#f3f2f1,stroke:#333
+    style D fill:#107C41,color:#fff
+    style G fill:#107C41,color:#fff
+
 
