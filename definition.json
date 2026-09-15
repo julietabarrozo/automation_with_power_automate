@@ -4,7 +4,7 @@
   "type": "Microsoft.Flow/flows",
   "properties": {
     "apiId": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
-    "displayName": "MoW Ad Hoc - Automated Mailbox & Teams Notification",
+    "displayName": "Process Name - Automated Mailbox & Teams Notification",
     "definition": {
       "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
       "contentVersion": "1.0.0.6",
