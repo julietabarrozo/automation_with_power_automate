@@ -1,0 +1,149 @@
+{
+  "name": "00000000-0000-0000-0000-000000000000",
+  "id": "/providers/Microsoft.Flow/flows/00000000-0000-0000-0000-000000000000",
+  "type": "Microsoft.Flow/flows",
+  "properties": {
+    "apiId": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
+    "displayName": "MoW Ad Hoc - Automated Mailbox & Teams Notification",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.6",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "When_a_new_email_arrives_in_a_shared_mailbox_(V2)": {
+          "recurrence": {
+            "frequency": "Minute",
+            "interval": 1
+          },
+          "splitOn": "@triggerOutputs()?['body/value']",
+          "type": "OpenApiConnection",
+          "inputs": {
+            "parameters": {
+              "mailboxAddress": "shared_mailbox@company.com",
+              "from": "sender@company.com"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365",
+              "connectionName": "shared_office365",
+              "operationId": "SharedMailboxOnNewEmailV2"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "actions": {
+        "Condition": {
+          "type": "If",
+          "expression": {
+            "and": [
+              {
+                "greaterOrEquals": [
+                  "@int(convertFromUtc(utcNow(), 'Eastern Standard Time', 'HH'))",
+                  8
+                ]
+              },
+              {
+                "less": [
+                  "@int(convertFromUtc(utcNow(), 'Eastern Standard Time', 'HH'))",
+                  17
+                ]
+              },
+              {
+                "greaterOrEquals": [
+                  "@dayOfWeek(convertFromUtc(utcNow(), 'Eastern Standard Time'))",
+                  1
+                ]
+              },
+              {
+                "lessOrEquals": [
+                  "@dayOfWeek(convertFromUtc(utcNow(), 'Eastern Standard Time'))",
+                  5
+                ]
+              }
+            ]
+          },
+          "actions": {
+            "Post_message_in_a_chat_or_channel_(True_Condition)": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "parameters": {
+                  "poster": "Flow bot",
+                  "location": "Chat with Flow bot",
+                  "body/recipient": "user@company.com",
+                  "body/messageBody": "<p class=\"editor-paragraph\">Hi, there's a new email for [Process Name]. Please review it!</p>"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_teams",
+                  "connectionName": "shared_teams",
+                  "operationId": "PostMessageToConversation"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            }
+          },
+          "else": {
+            "actions": {
+              "Day_of_the_Week": {
+                "type": "Compose",
+                "inputs": "@dayOfWeek(convertFromUtc(utcNow(), 'Eastern Standard Time'))"
+              },
+              "Days_to_Add": {
+                "runAfter": {
+                  "Day_of_the_Week": [
+                    "Succeeded"
+                  ]
+                },
+                "type": "Compose",
+                "inputs": "@if(equals(outputs('Day_of_the_Week'), 6), 2, if(equals(outputs('Day_of_the_Week'), 0), 1, if(greaterOrEquals(int(convertFromUtc(utcNow(), 'Eastern Standard Time', 'HH')), 17), 1, 0)))"
+              },
+              "Delay_Until": {
+                "runAfter": {
+                  "Days_to_Add": [
+                    "Succeeded"
+                  ]
+                },
+                "type": "Wait",
+                "inputs": {
+                  "until": {
+                    "timestamp": "@convertToUtc(concat(convertFromUtc(addDays(utcNow(), outputs('Days_to_Add')), 'Eastern Standard Time', 'yyyy-MM-dd'), 'T08:00:00'), 'Eastern Standard Time')"
+                  }
+                }
+              },
+              "Post_message_in_a_chat_or_channel_(False_Condition)": {
+                "runAfter": {
+                  "Delay_Until": [
+                    "Succeeded"
+                  ]
+                },
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "parameters": {
+                    "poster": "Flow bot",
+                    "location": "Chat with Flow bot",
+                    "body/recipient": "user@company.com",
+                    "body/messageBody": "<p class=\"editor-paragraph\">Hi, there's a new email for [Process Name]. Please review it!</p>"
+                  },
+                  "host": {
+                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_teams",
+                    "connectionName": "shared_teams",
+                    "operationId": "PostMessageToConversation"
+                  },
+                  "authentication": "@parameters('$authentication')"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
